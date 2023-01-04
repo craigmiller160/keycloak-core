@@ -6,7 +6,7 @@ import io.craigmiller160.keycloak.core.config.KeycloakConfig
 import io.craigmiller160.keycloak.core.function.TryEither
 import java.net.URL
 
-object KeycloakOperationService {
+class KeycloakOperationService {
     private fun getJwkEndpointForRealm(realmName: String): String =
         "/realms/$realmName/protocol/openid-connect/certs"
 
