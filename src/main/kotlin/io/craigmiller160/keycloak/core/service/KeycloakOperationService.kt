@@ -10,7 +10,7 @@ object KeycloakOperationService {
     private fun getJwkEndpointForRealm(realmName: String): String =
         "/realms/$realmName/protocol/openid-connect/certs"
 
-    private fun getJWKSet(config: KeycloakConfig): TryEither<JWKSet> = Either.catch {
+    fun getJWKSet(config: KeycloakConfig): TryEither<JWKSet> = Either.catch {
         val uri = getJwkEndpointForRealm(config.realmName)
         JWKSet.load(URL("${config.keycloakHost}$uri"))
     }
