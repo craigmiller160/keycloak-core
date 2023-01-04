@@ -19,7 +19,7 @@ data class KeycloakToken(
     val acr: String,
     val allowedOrigins: List<String>,
     val realmAccess: KeycloakRealmAccess,
-    val resourceAccess: KeycloakResourceAccess,
+    val resourceAccess: KeycloakResourcesAccess,
     val scope: String,
     val sid: UUID,
     val emailVerified: Boolean,
@@ -46,7 +46,16 @@ data class KeycloakToken(
                 sessionState = claims.getUUIDClaim("session_state"),
                 acr = claims.getStringClaim("acr"),
                 allowedOrigins = claims.getStringListClaim("allowed-origins"),
-                realmAccess = KeycloakRealmAccess.fromClaims(claims.getJSONObjectClaim("realm_access"))
+                realmAccess = KeycloakRealmAccess.fromClaims(claims.getJSONObjectClaim("realm_access")),
+                resourceAccess = KeycloakResourceAccess.fromAllResourcesClaims(claims.getJSONObjectClaim("resource_access")),
+                scope = claims.getStringClaim("scope"),
+                sid = claims.getUUIDClaim("sid"),
+                emailVerified = claims.getBooleanClaim("email_verified"),
+                name = claims.getStringClaim("name"),
+                preferredUsername = claims.getStringClaim("preferred_username"),
+                givenName = claims.getStringClaim("given_name"),
+                familyName = claims.getStringClaim("family_name"),
+                email = claims.getStringClaim("email")
             )
     }
 }
