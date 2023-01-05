@@ -29,9 +29,10 @@ class KeycloakTokenValidationService(
 
     // TODO need to take in RequestWrapper to pull out the token
     // TODO need to support insecure path evaluation
-    fun validateToken(token: String): TryEither<KeycloakToken> =
-        jwkService.getAndCacheJWKSet(config)
-            .flatMap { jwkSet -> either.eager {
+    fun validateToken(request: HttpRequest): TryEither<KeycloakToken> =
+        getTokenFromRequest(request)
+            .flatMap { token -> either.eager {
+                val jwkSet = jwkService.getAndCacheJWKSet(config).bind()
                 val jwt = Either.catch { SignedJWT.parse(token) }.bind()
                 jwt to jwkSet
             } }
