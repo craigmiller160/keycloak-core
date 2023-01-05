@@ -17,4 +17,9 @@ class KeycloakTokenValidationServiceTest {
     fun `validateToken - token does not have client access`() {
         TODO()
     }
+
+    @Test
+    fun `validateToken - path is insecure`() {
+        TODO()
+    }
 }
