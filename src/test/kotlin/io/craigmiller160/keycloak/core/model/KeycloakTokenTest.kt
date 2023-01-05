@@ -42,5 +42,14 @@ class KeycloakTokenTest {
       .hasFieldOrPropertyWithValue("givenName", "Test")
       .hasFieldOrPropertyWithValue("familyName", "User")
       .hasFieldOrPropertyWithValue("email", "john@gmail.com")
+
+    assertThat(token.realmAccess.roles)
+      .hasSize(3)
+      .contains("offline_access", "uma_authorization", "default-roles-my-realm")
+    assertThat(token.resourceAccess).hasSize(1).containsKeys("account")
+    assertThat(token.resourceAccess["account"]?.roles)
+      .isNotNull
+      .hasSize(3)
+      .contains("manage-account", "manage-account-links", "view-profile")
   }
 }
