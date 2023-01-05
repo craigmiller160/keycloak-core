@@ -1,4 +1,4 @@
-package io.craigmiller160.keycloak.core.model
+package io.craigmiller160.keycloak.core.model.keycloak
 
 data class KeycloakRealmAccess(
     override val roles: List<String>

@@ -13,7 +13,7 @@ import com.nimbusds.jwt.proc.JWTProcessor
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
 import io.craigmiller160.keycloak.core.function.TryEither
 import io.craigmiller160.keycloak.core.function.flatMapCatch
-import io.craigmiller160.keycloak.core.model.KeycloakToken
+import io.craigmiller160.keycloak.core.model.keycloak.KeycloakToken
 
 class KeycloakTokenValidationService(
     private val config: KeycloakConfig,

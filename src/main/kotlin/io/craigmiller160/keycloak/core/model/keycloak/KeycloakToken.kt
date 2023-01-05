@@ -1,4 +1,4 @@
-package io.craigmiller160.keycloak.core.model
+package io.craigmiller160.keycloak.core.model.keycloak
 
 import com.nimbusds.jwt.JWTClaimsSet
 import io.craigmiller160.keycloak.core.extension.getUUIDClaim
