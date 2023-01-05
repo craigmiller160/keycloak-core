@@ -5,8 +5,9 @@ import arrow.core.flatMap
 
 internal typealias TryEither<T> = Either<Throwable, T>
 
-internal fun <A,B> TryEither<A>.flatMapCatch(fn: (A) -> B): TryEither<B> =
-    flatMap { a -> Either.catch { fn(a) } }
+internal fun <A, B> TryEither<A>.flatMapCatch(fn: (A) -> B): TryEither<B> = flatMap { a ->
+  Either.catch { fn(a) }
+}
 
 internal fun <A> A?.leftIfNull(fn: () -> Throwable): TryEither<A> =
-    this?.let { Either.Right(it) } ?: Either.Left(fn())
+  this?.let { Either.Right(it) } ?: Either.Left(fn())
