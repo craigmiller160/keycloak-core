@@ -1,0 +1,41 @@
+{
+  "exp": 1672957697,
+  "iat": 1672957397,
+  "auth_time": 1672957397,
+  "jti": "c861cad8-80a4-4251-96cb-282a1e2a44a1",
+  "iss": "http://127.0.0.1:8080/realms/my-realm",
+  "aud": "account",
+  "sub": "12cf53ba-962e-4e68-a1ce-c61f6da7d759",
+  "typ": "Bearer",
+  "azp": "test-client",
+  "nonce": "9504bd8f-6d04-4c14-aea1-9f1c8ae58bf2",
+  "session_state": "f1532c46-5d48-41ef-bd46-1bfd6105dad1",
+  "acr": "1",
+  "allowed-origins": [
+    "http://localhost:3003"
+  ],
+  "realm_access": {
+    "roles": [
+      "offline_access",
+      "uma_authorization",
+      "default-roles-my-realm"
+    ]
+  },
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "manage-account-links",
+        "view-profile"
+      ]
+    }
+  },
+  "scope": "openid profile email",
+  "sid": "f1532c46-5d48-41ef-bd46-1bfd6105dad1",
+  "email_verified": true,
+  "name": "Test User",
+  "preferred_username": "test-user",
+  "given_name": "Test",
+  "family_name": "User",
+  "email": "craigmiller160@gmail.com"
+}
