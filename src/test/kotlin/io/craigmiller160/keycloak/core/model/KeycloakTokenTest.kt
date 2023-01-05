@@ -25,9 +25,9 @@ class KeycloakTokenTest {
       .hasFieldOrPropertyWithValue(
         "exp", Instant.ofEpochSecond(1672957697).atZone(ZoneId.of("UTC")))
       .hasFieldOrPropertyWithValue(
-        "iat", Instant.ofEpochSecond(1672957697).atZone(ZoneId.of("UTC")))
+        "iat", Instant.ofEpochSecond(1672957397).atZone(ZoneId.of("UTC")))
       .hasFieldOrPropertyWithValue(
-        "authTime", Instant.ofEpochSecond(1672957697).atZone(ZoneId.of("UTC")))
+        "authTime", Instant.ofEpochSecond(1672957397).atZone(ZoneId.of("UTC")))
       .hasFieldOrPropertyWithValue("jti", UUID.fromString("c861cad8-80a4-4251-96cb-282a1e2a44a1"))
       .hasFieldOrPropertyWithValue("iss", "http://127.0.0.1:8080/realms/my-realm")
       .hasFieldOrPropertyWithValue("aud", "account")

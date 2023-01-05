@@ -43,7 +43,7 @@ data class KeycloakToken(
         authTime = claims.getZDTFromMillisClaim("auth_time"),
         jti = claims.getUUIDClaim("jti"),
         iss = claims.getStringClaim("iss"),
-        aud = claims.getStringClaim("aud"),
+        aud = claims.getStringListClaim("aud").first(),
         sub = claims.getUUIDClaim("sub"),
         typ = claims.getStringClaim("typ"),
         azp = claims.getStringClaim("azp"),
