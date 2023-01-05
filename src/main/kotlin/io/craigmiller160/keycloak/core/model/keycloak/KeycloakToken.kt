@@ -2,12 +2,17 @@ package io.craigmiller160.keycloak.core.model.keycloak
 
 import com.nimbusds.jwt.JWTClaimsSet
 import io.craigmiller160.keycloak.core.extension.getUUIDClaim
+import io.craigmiller160.keycloak.core.extension.getZDTFromDateClaim
+import io.craigmiller160.keycloak.core.extension.getZDTFromMillisClaim
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.UUID
 
 data class KeycloakToken(
-  val exp: Long,
-  val iat: Long,
-  val authTime: Long,
+  val exp: ZonedDateTime,
+  val iat: ZonedDateTime,
+  val authTime: ZonedDateTime,
   val jti: UUID,
   val iss: String,
   val aud: String,
@@ -33,9 +38,9 @@ data class KeycloakToken(
     @JvmStatic
     fun fromClaimsSet(claims: JWTClaimsSet): KeycloakToken =
       KeycloakToken(
-        exp = claims.getLongClaim("exp"),
-        iat = claims.getLongClaim("iat"),
-        authTime = claims.getLongClaim("auth_time"),
+        exp = claims.getZDTFromDateClaim("exp"),
+        iat = claims.getZDTFromDateClaim("iat"),
+        authTime = claims.getZDTFromMillisClaim("auth_time"),
         jti = claims.getUUIDClaim("jti"),
         iss = claims.getStringClaim("iss"),
         aud = claims.getStringClaim("aud"),
@@ -59,4 +64,8 @@ data class KeycloakToken(
         familyName = claims.getStringClaim("family_name"),
         email = claims.getStringClaim("email"))
   }
+}
+
+fun foo() {
+  val foo = Instant.ofEpochMilli(0).atZone(ZoneId.systemDefault())
 }
