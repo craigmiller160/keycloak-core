@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
 import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import com.nimbusds.jwt.proc.JWTProcessor
@@ -37,21 +38,25 @@ class KeycloakTokenValidationService(
                 jwt to jwkSet
             } }
             .map { (jwt, jwkSet) -> jwt to createJwtProcessor(jwt, jwkSet) }
-            .flatMapCatch { (jwt, jwtProcessor) -> jwtProcessor.process(jwt, null) }
+            .flatMap { (jwt, jwtProcessor) -> processJwt(jwt, jwtProcessor) }
             .map { KeycloakToken.fromClaimsSet(it) }
             .flatMap { validateTokenClaims(it) }
+
+    private fun processJwt(jwt: SignedJWT, jwtProcessor: JWTProcessor<SecurityContext>): TryEither<JWTClaimsSet> =
+        Either.catch { jwtProcessor.process(jwt, null) }
+            .mapLeft { KeycloakTokenValidationException("Invalid token", it) }
 
     private fun getTokenFromRequest(request: HttpRequest): TryEither<String> =
         request.getHeaderValue("Authorization")
             ?.replace("Bearer ", "")
             .leftIfNull { KeycloakTokenValidationException("No bearer token in request") }
 
-    private fun validateTokenClaims(token: KeycloakToken): TryEither<KeycloakToken> {
-        if (token.resourceAccess[config.clientId]?.roles?.contains(ACCESS_ROLE_NAME) == true) {
-            TODO()
+    private fun validateTokenClaims(token: KeycloakToken): TryEither<KeycloakToken> =
+        Either.conditionally(
+            token.resourceAccess[config.clientId]?.roles?.contains(ACCESS_ROLE_NAME) == true,
+            { KeycloakTokenValidationException("Invalid token") }) {
+            token
         }
-        TODO()
-    }
 
     private fun createJwtProcessor(jwt: SignedJWT, jwkSet: JWKSet): JWTProcessor<SecurityContext> {
         val keySource = ImmutableJWKSet<SecurityContext>(jwkSet)
