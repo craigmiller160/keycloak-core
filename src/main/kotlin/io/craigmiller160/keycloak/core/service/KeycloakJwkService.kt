@@ -5,8 +5,10 @@ import com.nimbusds.jose.jwk.JWKSet
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
 import io.craigmiller160.keycloak.core.function.TryEither
 import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
 
-class KeycloakOperationService {
+class KeycloakJwkService {
+    private val cache = ConcurrentHashMap<String,TryEither<JWKSet>>()
     private fun getJwkEndpointForRealm(realmName: String): String =
         "/realms/$realmName/protocol/openid-connect/certs"
 
@@ -14,4 +16,9 @@ class KeycloakOperationService {
         val uri = getJwkEndpointForRealm(config.realmName)
         JWKSet.load(URL("${config.keycloakHost}$uri"))
     }
+
+    fun getAndCacheJWKSet(config: KeycloakConfig): TryEither<JWKSet> =
+        cache.computeIfAbsent(config.realmName) {
+            getJWKSet(config)
+        }
 }
