@@ -17,6 +17,7 @@ import io.craigmiller160.keycloak.core.exception.KeycloakTokenValidationExceptio
 import io.craigmiller160.keycloak.core.function.TryEither
 import io.craigmiller160.keycloak.core.function.flatMapCatch
 import io.craigmiller160.keycloak.core.function.leftIfNull
+import io.craigmiller160.keycloak.core.model.TokenValidationResponse
 import io.craigmiller160.keycloak.core.model.keycloak.KeycloakToken
 import io.craigmiller160.keycloak.core.model.request.HttpRequest
 import org.apache.shiro.util.AntPathMatcher
@@ -29,18 +30,22 @@ class KeycloakTokenValidationService(
         private const val ACCESS_ROLE_NAME = "access"
     }
 
-    // TODO need to support insecure path evaluation
-    fun validateToken(request: HttpRequest): TryEither<KeycloakToken> =
-        getTokenFromRequest(request)
-            .flatMap { token -> either.eager {
-                val jwkSet = jwkService.getAndCacheJWKSet(config).bind()
-                val jwt = Either.catch { SignedJWT.parse(token) }.bind()
-                jwt to jwkSet
-            } }
-            .map { (jwt, jwkSet) -> jwt to createJwtProcessor(jwt, jwkSet) }
-            .flatMap { (jwt, jwtProcessor) -> processJwt(jwt, jwtProcessor) }
-            .map { KeycloakToken.fromClaimsSet(it) }
-            .flatMap { validateTokenClaims(it) }
+    fun validateToken(request: HttpRequest): TryEither<TokenValidationResponse> {
+        if (isUriSecured(request)) {
+            return getTokenFromRequest(request)
+                .flatMap { token -> either.eager {
+                    val jwkSet = jwkService.getAndCacheJWKSet(config).bind()
+                    val jwt = Either.catch { SignedJWT.parse(token) }.bind()
+                    jwt to jwkSet
+                } }
+                .map { (jwt, jwkSet) -> jwt to createJwtProcessor(jwt, jwkSet) }
+                .flatMap { (jwt, jwtProcessor) -> processJwt(jwt, jwtProcessor) }
+                .map { KeycloakToken.fromClaimsSet(it) }
+                .flatMap { validateTokenClaims(it) }
+                .map { TokenValidationResponse(true, it) }
+        }
+        return Either.Right(TokenValidationResponse(false))
+    }
 
     private fun isUriSecured(request: HttpRequest): Boolean {
         val antMatcher = AntPathMatcher()
