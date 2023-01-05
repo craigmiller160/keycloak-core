@@ -19,6 +19,9 @@ class KeycloakTokenValidationService(
     private val config: KeycloakConfig,
     private val jwkService: KeycloakJwkService
 ) {
+    companion object {
+        private const val ACCESS_ROLE_NAME = "access"
+    }
 
     fun validateToken(token: String): TryEither<KeycloakToken> =
         jwkService.getAndCacheJWKSet(config)
@@ -32,6 +35,9 @@ class KeycloakTokenValidationService(
             .flatMap { validateTokenClaims(it) }
 
     private fun validateTokenClaims(token: KeycloakToken): TryEither<KeycloakToken> {
+        if (token.resourceAccess[config.clientId]?.roles?.contains(ACCESS_ROLE_NAME) == true) {
+            TODO()
+        }
         TODO()
     }
 
