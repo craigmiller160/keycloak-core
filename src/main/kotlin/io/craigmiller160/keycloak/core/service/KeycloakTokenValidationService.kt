@@ -19,6 +19,7 @@ import io.craigmiller160.keycloak.core.function.flatMapCatch
 import io.craigmiller160.keycloak.core.function.leftIfNull
 import io.craigmiller160.keycloak.core.model.keycloak.KeycloakToken
 import io.craigmiller160.keycloak.core.model.request.HttpRequest
+import org.apache.shiro.util.AntPathMatcher
 
 class KeycloakTokenValidationService(
     private val config: KeycloakConfig,
@@ -28,7 +29,6 @@ class KeycloakTokenValidationService(
         private const val ACCESS_ROLE_NAME = "access"
     }
 
-    // TODO need to take in RequestWrapper to pull out the token
     // TODO need to support insecure path evaluation
     fun validateToken(request: HttpRequest): TryEither<KeycloakToken> =
         getTokenFromRequest(request)
@@ -41,6 +41,11 @@ class KeycloakTokenValidationService(
             .flatMap { (jwt, jwtProcessor) -> processJwt(jwt, jwtProcessor) }
             .map { KeycloakToken.fromClaimsSet(it) }
             .flatMap { validateTokenClaims(it) }
+
+    private fun isUriSecured(request: HttpRequest): Boolean {
+        val antMatcher = AntPathMatcher()
+        return config.insecurePaths.any { antMatcher.match(it, request.requestUri) }
+    }
 
     private fun processJwt(jwt: SignedJWT, jwtProcessor: JWTProcessor<SecurityContext>): TryEither<JWTClaimsSet> =
         Either.catch { jwtProcessor.process(jwt, null) }

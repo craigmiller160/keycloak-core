@@ -5,4 +5,5 @@ interface KeycloakConfig {
     val clientSecret: String
     val realmName: String
     val keycloakHost: String
+    val insecurePaths: List<String>
 }
