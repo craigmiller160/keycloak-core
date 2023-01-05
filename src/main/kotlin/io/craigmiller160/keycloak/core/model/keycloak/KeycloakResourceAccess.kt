@@ -1,7 +1,5 @@
 package io.craigmiller160.keycloak.core.model.keycloak
 
-import io.craigmiller160.keycloak.core.model.KeycloakResourcesAccess
-
 data class KeycloakResourceAccess(
     override val roles: List<String>
 ) : KeycloakAccessEntity {
