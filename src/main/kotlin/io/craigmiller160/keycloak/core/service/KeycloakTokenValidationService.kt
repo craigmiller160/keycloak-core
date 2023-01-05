@@ -2,6 +2,7 @@ package io.craigmiller160.keycloak.core.service
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import arrow.core.leftIfNull
 import arrow.core.flatMap
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
@@ -11,9 +12,12 @@ import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import com.nimbusds.jwt.proc.JWTProcessor
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
+import io.craigmiller160.keycloak.core.exception.KeycloakTokenValidationException
 import io.craigmiller160.keycloak.core.function.TryEither
 import io.craigmiller160.keycloak.core.function.flatMapCatch
+import io.craigmiller160.keycloak.core.function.leftIfNull
 import io.craigmiller160.keycloak.core.model.keycloak.KeycloakToken
+import io.craigmiller160.keycloak.core.model.request.HttpRequest
 
 class KeycloakTokenValidationService(
     private val config: KeycloakConfig,
@@ -35,6 +39,11 @@ class KeycloakTokenValidationService(
             .flatMapCatch { (jwt, jwtProcessor) -> jwtProcessor.process(jwt, null) }
             .map { KeycloakToken.fromClaimsSet(it) }
             .flatMap { validateTokenClaims(it) }
+
+    private fun getTokenFromRequest(request: HttpRequest): TryEither<String> =
+        request.getHeaderValue("Authorization")
+            ?.replace("Bearer ", "")
+            .leftIfNull { KeycloakTokenValidationException("No bearer token in request") }
 
     private fun validateTokenClaims(token: KeycloakToken): TryEither<KeycloakToken> {
         if (token.resourceAccess[config.clientId]?.roles?.contains(ACCESS_ROLE_NAME) == true) {
