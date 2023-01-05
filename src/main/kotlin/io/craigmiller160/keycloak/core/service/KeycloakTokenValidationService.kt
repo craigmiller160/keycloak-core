@@ -23,6 +23,8 @@ class KeycloakTokenValidationService(
         private const val ACCESS_ROLE_NAME = "access"
     }
 
+    // TODO need to take in RequestWrapper to pull out the token
+    // TODO need to support insecure path evaluation
     fun validateToken(token: String): TryEither<KeycloakToken> =
         jwkService.getAndCacheJWKSet(config)
             .flatMap { jwkSet -> either.eager {
