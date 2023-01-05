@@ -12,7 +12,7 @@ typealias JwkDownloader = (String) -> InputStream
 
 class KeycloakJwkService(private val downloader: JwkDownloader = { url -> URL(url).openStream() }) {
   private val cache = ConcurrentHashMap<String, TryEither<JWKSet>>()
-  private fun getJwkEndpointForRealm(realmName: String): String =
+  fun getJwkEndpointForRealm(realmName: String): String =
     "/realms/$realmName/protocol/openid-connect/certs"
 
   fun getJWKSet(config: KeycloakConfig): TryEither<JWKSet> =
