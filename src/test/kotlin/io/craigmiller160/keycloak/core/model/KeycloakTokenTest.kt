@@ -4,6 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.nimbusds.jwt.JWTClaimsSet
 import io.craigmiller160.keycloak.core.model.keycloak.KeycloakToken
+import java.time.Instant
+import java.time.ZoneId
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -20,9 +22,12 @@ class KeycloakTokenTest {
 
     val token = KeycloakToken.fromClaimsSet(claimsSet)
     assertThat(token)
-      .hasFieldOrPropertyWithValue("exp", 1672957697L)
-      .hasFieldOrPropertyWithValue("iat", 1672957397)
-      .hasFieldOrPropertyWithValue("authTime", 1672957397)
+      .hasFieldOrPropertyWithValue(
+        "exp", Instant.ofEpochSecond(1672957697).atZone(ZoneId.of("UTC")))
+      .hasFieldOrPropertyWithValue(
+        "iat", Instant.ofEpochSecond(1672957697).atZone(ZoneId.of("UTC")))
+      .hasFieldOrPropertyWithValue(
+        "authTime", Instant.ofEpochSecond(1672957697).atZone(ZoneId.of("UTC")))
       .hasFieldOrPropertyWithValue("jti", UUID.fromString("c861cad8-80a4-4251-96cb-282a1e2a44a1"))
       .hasFieldOrPropertyWithValue("iss", "http://127.0.0.1:8080/realms/my-realm")
       .hasFieldOrPropertyWithValue("aud", "account")
