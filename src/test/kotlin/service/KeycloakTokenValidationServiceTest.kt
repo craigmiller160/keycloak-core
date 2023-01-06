@@ -1,6 +1,7 @@
 package service
 
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
+import io.craigmiller160.keycloak.core.model.request.HttpRequest
 import io.craigmiller160.keycloak.core.service.KeycloakJwkService
 import io.craigmiller160.keycloak.core.service.KeycloakTokenValidationService
 import org.junit.jupiter.api.BeforeEach
@@ -50,6 +51,13 @@ class KeycloakTokenValidationServiceTest {
 
   @Test
   fun `validateToken - path is insecure`() {
+    val request =
+      object : HttpRequest {
+        override val requestUri: String = INSECURE_PATH
+        override fun getHeaderValue(headerName: String): String? = null
+      }
+
+    tokenValidationService.validateToken(request)
     TODO()
   }
 }
