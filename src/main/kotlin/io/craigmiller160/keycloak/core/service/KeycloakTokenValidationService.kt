@@ -50,7 +50,7 @@ class KeycloakTokenValidationService(
 
   private fun isUriSecured(request: HttpRequest): Boolean {
     val antMatcher = AntPathMatcher()
-    return config.insecurePaths.any { antMatcher.match(it, request.requestUri) }
+    return !config.insecurePaths.any { antMatcher.match(it, request.requestUri) }
   }
 
   private fun processJwt(
