@@ -1,8 +1,11 @@
 package service
 
+import arrow.core.getOrHandle
+import com.nimbusds.jose.jwk.JWKSet
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
-import io.craigmiller160.keycloak.core.service.JwkDownloader
 import io.craigmiller160.keycloak.core.service.KeycloakJwkService
+import java.io.InputStream
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
@@ -15,17 +18,33 @@ class KeycloakJwkServiceTest {
     private const val HOST = "https://keycloak.com"
     private const val REALM = "my-realm"
   }
-  @Mock private lateinit var downloader: JwkDownloader
   @Mock private lateinit var config: KeycloakConfig
   @Test
   fun getAndCacheJWKSet() {
     val stream =
-      KeycloakJwkServiceTest::class.java.classLoader.getResourceAsStream("keycloak-jwk.json")
+      KeycloakJwkServiceTest::class.java.classLoader.getResourceAsStream("keycloak-jwk.json")!!
     whenever(config.keycloakHost).thenReturn(HOST)
     whenever(config.realmName).thenReturn(REALM)
-    whenever(downloader).thenReturn { stream }
 
-    val service = KeycloakJwkService(downloader)
-    TODO()
+    var url = ""
+    var downloaderCount = 0
+    val service = KeycloakJwkService {
+      url = it
+      downloaderCount++
+      getJwkStream()
+    }
+    val jwkSet = service.getAndCacheJWKSet(config).getOrHandle { throw it }
+    assertEquals("$HOST${service.getJwkEndpointForRealm(REALM)}", url)
+
+    val expected = JWKSet.load(getJwkStream())
+    assertEquals(2, jwkSet.keys.size)
+    assertEquals(expected.keys[0], jwkSet.keys[0])
+    assertEquals(expected.keys[1], jwkSet.keys[1])
+
+    service.getAndCacheJWKSet(config).getOrHandle { throw it }
+    assertEquals(1, downloaderCount)
   }
+
+  private fun getJwkStream(): InputStream =
+    KeycloakJwkServiceTest::class.java.classLoader.getResourceAsStream("keycloak-jwk.json")!!
 }
