@@ -4,6 +4,8 @@ import io.craigmiller160.keycloak.core.config.KeycloakConfig
 import io.craigmiller160.keycloak.core.model.request.HttpRequest
 import io.craigmiller160.keycloak.core.service.KeycloakJwkService
 import io.craigmiller160.keycloak.core.service.KeycloakTokenValidationService
+import io.kotest.assertions.arrow.core.shouldBeRight
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -57,7 +59,9 @@ class KeycloakTokenValidationServiceTest {
         override fun getHeaderValue(headerName: String): String? = null
       }
 
-    tokenValidationService.validateToken(request)
-    TODO()
+    val response = tokenValidationService.validateToken(request).shouldBeRight()
+    assertThat(response)
+      .hasFieldOrPropertyWithValue("isSecureUri", false)
+      .hasFieldOrPropertyWithValue("token", null)
   }
 }
