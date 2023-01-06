@@ -29,9 +29,9 @@ class KeycloakTokenValidationService(
     private const val ACCESS_ROLE_NAME = "access"
   }
 
-  fun validateToken(request: HttpRequest): TryEither<TokenValidationResponse> {
+  fun validateToken(request: HttpRequest): TryEither<TokenValidationResponse> =
     if (isUriSecured(request)) {
-      return getTokenFromRequest(request)
+      getTokenFromRequest(request)
         .flatMap { token ->
           either.eager {
             val jwkSet = jwkService.getAndCacheJWKSet(config).bind()
@@ -44,9 +44,9 @@ class KeycloakTokenValidationService(
         .map { KeycloakToken.fromClaimsSet(it) }
         .flatMap { validateTokenClaims(it) }
         .map { TokenValidationResponse(true, it) }
+    } else {
+      Either.Right(TokenValidationResponse(false))
     }
-    return Either.Right(TokenValidationResponse(false))
-  }
 
   private fun isUriSecured(request: HttpRequest): Boolean {
     val antMatcher = AntPathMatcher()
