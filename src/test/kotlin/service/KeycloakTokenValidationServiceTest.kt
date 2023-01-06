@@ -1,10 +1,13 @@
 package service
 
+import com.nimbusds.jose.jwk.JWKSet
+import com.nimbusds.jwt.JWTClaimsSet
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
 import io.craigmiller160.keycloak.core.model.request.HttpRequest
 import io.craigmiller160.keycloak.core.service.KeycloakJwkService
 import io.craigmiller160.keycloak.core.service.KeycloakTokenValidationService
 import io.kotest.assertions.arrow.core.shouldBeRight
+import java.io.InputStream
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,11 +33,19 @@ class KeycloakTokenValidationServiceTest {
       override val insecurePaths: List<String> = listOf(INSECURE_PATH)
     }
   private lateinit var tokenValidationService: KeycloakTokenValidationService
+  private lateinit var jwtClaims: JWTClaimsSet
+  private lateinit var jwkSet: JWKSet
 
   @BeforeEach
   fun setup() {
     tokenValidationService = KeycloakTokenValidationService(config, jwkService)
+    jwkSet = openResourceStream("keycloak-jwk.json").let { JWKSet.load(it) }
+    jwtClaims =
+      openResourceStream("keycloak-token.json").reader().readText().let { JWTClaimsSet.parse(it) }
   }
+
+  private fun openResourceStream(path: String): InputStream =
+    KeycloakTokenValidationServiceTest::class.java.classLoader.getResourceAsStream(path)!!
 
   @Test
   fun `validateToken - token is valid`() {
