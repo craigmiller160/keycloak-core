@@ -1,9 +1,9 @@
 package service
 
-import arrow.core.getOrHandle
 import com.nimbusds.jose.jwk.JWKSet
 import io.craigmiller160.keycloak.core.config.KeycloakConfig
 import io.craigmiller160.keycloak.core.service.KeycloakJwkService
+import io.kotest.assertions.arrow.core.shouldBeRight
 import java.io.InputStream
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class KeycloakJwkServiceTest {
       downloaderCount++
       getJwkStream()
     }
-    val jwkSet = service.getAndCacheJWKSet(config).getOrHandle { throw it }
+    val jwkSet = service.getAndCacheJWKSet(config).shouldBeRight()
     assertEquals("$HOST${service.getJwkEndpointForRealm(REALM)}", url)
 
     val expected = JWKSet.load(getJwkStream())
@@ -41,7 +41,7 @@ class KeycloakJwkServiceTest {
     assertEquals(expected.keys[0], jwkSet.keys[0])
     assertEquals(expected.keys[1], jwkSet.keys[1])
 
-    service.getAndCacheJWKSet(config).getOrHandle { throw it }
+    service.getAndCacheJWKSet(config).shouldBeRight()
     assertEquals(1, downloaderCount)
   }
 
